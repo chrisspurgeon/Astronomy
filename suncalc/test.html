@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>suncalc.js test</title>
+		<script src="./suncalc.js"></script>
+	</head>
+	<body>
+		<h1>testing suncalc.js</h1>
+
+		<script>
+			var date = new Date('2013-03-05UTC'),
+			    lat = 50.5,
+			    lng = 30.5;
+
+			console.log("date.valueOf() is " + date.valueOf());
+			var sunPos = SunCalc.getPosition(date, lat, lng);
+
+		</script>
+
+	</body>
+</html>
