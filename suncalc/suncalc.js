@@ -69,8 +69,9 @@ function sunCoords(d) {
 
     var M = solarMeanAnomaly(d),
         L = eclipticLongitude(M);
-        console.log("M is " + M);
-        console.log("L is " + L);
+        console.log("inside sunCoords d is " + d);
+        console.log("M (solarMeanAnomaly) is " + M);
+        console.log("L (eclipticLongitude) is " + L);
 
     return {
         dec: declination(L, 0),
@@ -89,17 +90,19 @@ SunCalc.getPosition = function (date, lat, lng) {
     var lw  = rad * -lng,
         phi = rad * lat,
         d   = toDays(date),
-        d_test = toDays(date.valueOf()),
 
         c  = sunCoords(d),
         H  = siderealTime(d, lw) - c.ra;
-        console.log("rad is " + rad);
-        console.log("d is " + d + " and d_test is " + d_test);
+
+
+        console.log("date is " + date);
         console.log("lat is " + lat);
-        console.log("lon is " + lng);
+        console.log("lng is " + lng);
+        console.log("d (calculated by toDays) is " + d);
         console.log("lw is " + lw);
         console.log("phi is " + phi);
         console.log("c is " + c);
+        console.log("H (calculated by siderealTime) is " + H);
 
     return {
         azimuth: azimuth(H, phi, c.dec),

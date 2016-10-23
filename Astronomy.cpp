@@ -5,6 +5,8 @@
 #define dayMs   (60.0 * 60.0 * 24.0) // really daySecs
 #define J1970   2440588
 #define J2000   2451545
+#define e       rad * 23.4397 // obliquity of the Earth
+
 
 
 
@@ -19,28 +21,43 @@ void Astronomy::ping() {
 	Serial.println(PI * 10000.0);
 }
 
-void Astronomy::getPosition() {
+celestialCoordinates Astronomy::getPosition() {
+	celestialCoordinates theCoordinates;
 	float lw  = rad * _lon * -1.0;
 	float phi = rad * _lat;
 	float d = toDays(_time);
+
 	Serial.print("rad is ");
 	Serial.println(rad);
 	Serial.print("time is ");
 	Serial.println(_time);
 	Serial.print("_lon is ");
 	Serial.println(_lon);
+	Serial.print("_lat is ");
+	Serial.println(_lat);
+
 	Serial.print("lw is ");
 	Serial.println(lw);
 	Serial.print("phi is ");
 	Serial.println(phi);
-	Serial.print("d is ");
+	Serial.print("d (as calculated by toDays) is ");
 	Serial.println(d);
+
 	float M = solarMeanAnomaly(d);
-	float foo = eclipticLongitude(M);
-	Serial.print("M is ");
+	float L = eclipticLongitude(M);
+	Serial.print("M (as calculated by solarMeanAnomaly) is ");
 	Serial.println(M);
-	Serial.print("foo is ");
-	Serial.println(foo);
+	Serial.print("L (as calculated by eclipticLongitude) is ");
+	Serial.println(L);
+	theCoordinates = sunCoords(d);
+	Serial.print("theCoordinates.DECLINATION is ");
+	Serial.println(theCoordinates.DECLINATION);
+	Serial.print("theCoordinates.RIGHTASCENSION is ");
+	Serial.println(theCoordinates.RIGHTASCENSION);
+	float H  = siderealTime(d, lw) - theCoordinates.RIGHTASCENSION;
+	Serial.print("H (siderialTime) is ");
+	Serial.println(H);
+
 }
 
 float Astronomy::toJulian(long time) { 
@@ -64,7 +81,40 @@ float Astronomy::eclipticLongitude(float M) {
   return M + C + P + PI;
 }
 
+float Astronomy::rightAscension(float l, float b) {
+	return atan2(sin(l) * cos(e) - tan(b) * sin(e), cos(l));
+}
 
+float Astronomy::declination(float l, float b) {
+	return asin(sin(b) * cos(e) + cos(b) * sin(e) * sin(l));
+}
+
+float Astronomy::azimuth(float H, float phi, float dec) {
+	return atan2(sin(H), cos(H) * sin(phi) - tan(dec) * cos(phi));
+}
+
+float Astronomy::altitude(float H, float phi, float dec) {
+	return asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(H));
+}
+
+float Astronomy::siderealTime(long d, float lw) {
+	return rad * (280.16 + 360.9856235 * d) - lw;
+}
+
+celestialCoordinates Astronomy::sunCoords(long d) {
+	Serial.print("inside sunCoords d is ");
+	Serial.println(d);
+	celestialCoordinates theCoordinates;
+	float M = solarMeanAnomaly(d);
+	// Serial.print("M (solarMeanAnomaly) is ");
+	// Serial.println(M);
+	float L = eclipticLongitude(M);
+	// Serial.print("L (eclipticLongitude) is ");
+	// Serial.println(L);
+	theCoordinates.DECLINATION = Astronomy::declination(L, 0.0);
+	theCoordinates.RIGHTASCENSION = Astronomy::rightAscension(L, 0.0);
+	return theCoordinates;
+}
 
 
 
