@@ -10,7 +10,7 @@
 
 
 
-Astronomy::Astronomy(long time, float lat, float lon) {
+Astronomy::Astronomy(unsigned long time, float lat, float lon) {
 	_time = time;
 	_lat = lat;
 	_lon = lon;
@@ -37,41 +37,41 @@ celestialCoordinates Astronomy::getPosition() {
 	Serial.println(_lat);
 
 	Serial.print("lw is ");
-	Serial.println(lw);
+	Serial.println((float)lw,12);
 	Serial.print("phi is ");
-	Serial.println(phi);
+	Serial.println((float)phi,12);
 	Serial.print("d (as calculated by toDays) is ");
-	Serial.println(d);
+	Serial.println((float)d,12);
 
 	float M = solarMeanAnomaly(d);
 	float L = eclipticLongitude(M);
 	Serial.print("M (as calculated by solarMeanAnomaly) is ");
-	Serial.println(M);
+	Serial.println((float)M,12);
 	Serial.print("L (as calculated by eclipticLongitude) is ");
-	Serial.println(L);
+	Serial.println((float)L,12);
 	theCoordinates = sunCoords(d);
 	Serial.print("theCoordinates.DECLINATION is ");
-	Serial.println(theCoordinates.DECLINATION);
+	Serial.println((float)theCoordinates.DECLINATION,12);
 	Serial.print("theCoordinates.RIGHTASCENSION is ");
-	Serial.println(theCoordinates.RIGHTASCENSION);
+	Serial.println((float)theCoordinates.RIGHTASCENSION,12);
 	float H  = siderealTime(d, lw) - theCoordinates.RIGHTASCENSION;
 	Serial.print("H (siderialTime) is ");
-	Serial.println(H);
+	Serial.println((float)H,12);
 
 }
 
-float Astronomy::toJulian(long time) { 
+float Astronomy::toJulian(unsigned long time) { 
 	return time / dayMs - 0.5 + J1970;
 }
 float Astronomy::fromJulian(float j) {
 	return (j + 0.5 - J1970) * dayMs;
 }
 
-float Astronomy::toDays(long time) {
+float Astronomy::toDays(unsigned long time) {
 	return toJulian(time) - J2000; 
 }
 
-float Astronomy::solarMeanAnomaly(long time) { 
+float Astronomy::solarMeanAnomaly(unsigned long time) { 
 	return rad * (357.5291 + 0.98560028 * time); 
 }
 
@@ -97,11 +97,11 @@ float Astronomy::altitude(float H, float phi, float dec) {
 	return asin(sin(phi) * sin(dec) + cos(phi) * cos(dec) * cos(H));
 }
 
-float Astronomy::siderealTime(long d, float lw) {
+float Astronomy::siderealTime(unsigned long d, float lw) {
 	return rad * (280.16 + 360.9856235 * d) - lw;
 }
 
-celestialCoordinates Astronomy::sunCoords(long d) {
+celestialCoordinates Astronomy::sunCoords(unsigned long d) {
 	Serial.print("inside sunCoords d is ");
 	Serial.println(d);
 	celestialCoordinates theCoordinates;
